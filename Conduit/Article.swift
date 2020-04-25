@@ -9,7 +9,7 @@ struct Article: Decodable {
         let image: String
         let following: Bool
     }
-    
+
     let slug: Slug
     let title: String
     let description: String
@@ -39,29 +39,35 @@ extension Article {
 
         return decoder
     }()
-    
+
     static func fetchFeed() -> AnyPublisher<[Article], Error> {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
         urlComponents.host = "conduit.productionready.io"
         urlComponents.path = "/api/articles"
         urlComponents.queryItems = []
-        
-        guard let url = urlComponents.url else { preconditionFailure() }
-        
+
+        guard let url = urlComponents.url else {
+            preconditionFailure()
+        }
+
         let urlRequest = URLRequest(url: url)
 
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
-            .map { $0.data }
+            .map {
+                $0.data
+            }
             .decode(type: Articles.self, decoder: decoder)
-            .map { $0.articles }
+            .map {
+                $0.articles
+            }
             .eraseToAnyPublisher()
     }
 }
 
 extension Article: Identifiable {
     var id: Article.Slug {
-        return slug
+        slug
     }
 }
 
@@ -81,7 +87,7 @@ extension Article.Slug: ExpressibleByStringLiteral {
 
 extension Article.Slug: CustomStringConvertible {
     var description: String {
-        return string
+        string
     }
 }
 

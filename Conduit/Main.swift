@@ -3,103 +3,54 @@ import SwiftUI
 
 // MARK: MODEL
 
-struct Model {
-    let articles: [Article]
-}
-
-extension Model {
-    func copy(articles: [Article]? = nil) -> Model {
-        Model(
-            articles: articles ?? self.articles
-        )
-    }
-}
-
-func start() -> (Model, AnyPublisher<Msg, Never>) {
-    (Model(articles: [])
-        , Article.fetchFeed()
-        .mapError { (error: Error) -> Error in
-            print("Error: \(error.localizedDescription))")
-            return error
-        }
-        .replaceError(with: [])
-        .map { articles in
-            Msg.gotArticles(articles: articles)
-        }
-        .eraseToAnyPublisher()
-    )
+enum Model {
+    case home(Home.Model)
 }
 
 // MARK: UPDATE
 
 enum Msg {
-    case gotArticles(articles: [Article])
+    case home(Home.Msg)
 }
 
 func update(model: Model, msg: Msg) -> (Model, AnyPublisher<Msg, Never>) {
-    switch msg {
-    case let .gotArticles(articles):
-        return (
-            model.copy(articles: articles),
-            Empty().eraseToAnyPublisher()
-        )
+    switch (msg, model) {
+    case let (.home(pageMsg), .home(pageModel)):
+        return updateWith(Model.home, Msg.home, Home.update(model: pageModel, msg: pageMsg))
     }
+}
+
+private func updateWith<SubModel, Model, SubMsg, Msg>(
+    _ toModel: (SubModel) -> Model,
+    _ toMsg: @escaping (SubMsg) -> Msg,
+    _ result: (SubModel, AnyPublisher<SubMsg, Never>)
+) -> (Model, AnyPublisher<Msg, Never>) {
+    (toModel(result.0), result.1.map {
+        toMsg($0)
+    }.eraseToAnyPublisher())
 }
 
 // MARK: VIEW
 
-struct MainView: View {
+private struct view: View {
     @EnvironmentObject var app: Store<Model, Msg>
 
     var body: some View {
-        let articles = app.model.articles
-
-        return NavigationView {
-            List {
-                if articles.isEmpty {
-                    Text("Loading...")
-                } else {
-                    ForEach(articles) {
-                        ArticleRow(article: $0)
-                    }
-                }
-            }
-                .navigationBarTitle(Text("Conduit"))
-        }
-    }
-}
-
-struct ArticleRow: View {
-    let article: Article
-
-    var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading) {
-                Text(article.title)
-                    .font(.headline)
-                Text(article.description)
-                    .font(.subheadline)
-            }
+        switch app.model {
+        case let .home(pageModel):
+            return Home.view(model: pageModel)
         }
     }
 }
 
 // MARK: STORE
 
-func createStore() -> Store<Model, Msg> {
-    let model = Model(articles: [])
-    let effect = Article.fetchFeed()
-        .replaceError(with: [])
-        .map { articles in
-            Msg.gotArticles(articles: articles)
-        }
-        .eraseToAnyPublisher()
+func createContent() -> some View {
+    let (model, effect) = updateWith(Model.home, Msg.home, Home.start())
 
-    return Store(
-        model: model,
-        effect: effect,
-        update: update
-    )
+    let store = Store(model: model, effect: effect, update: update)
+
+    return view().environmentObject(store)
 }
 
 final class Store<Model, Msg>: ObservableObject {
