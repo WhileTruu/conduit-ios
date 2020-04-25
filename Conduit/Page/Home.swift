@@ -11,17 +11,17 @@ struct Home {
 
     static func start() -> (Model, AnyPublisher<Msg, Never>) {
         (
-            Model(articles: [])
-            , Article.fetchFeed()
-            .mapError { (error: Error) -> Error in
-                print("Error: \(error.localizedDescription))")
-                return error
-            }
-            .replaceError(with: [])
-            .map { articles in
-                Msg.gotArticles(articles: articles)
-            }
-            .eraseToAnyPublisher()
+            Model(articles: []),
+            Article.fetchFeed()
+                .mapError { (error: Error) -> Error in
+                    print("Error: \(error.localizedDescription))")
+                    return error
+                }
+                .replaceError(with: [])
+                .map { articles in
+                    Msg.gotArticles(articles: articles)
+                }
+                .eraseToAnyPublisher()
         )
     }
 
@@ -31,7 +31,7 @@ struct Home {
         case gotArticles(articles: [Article])
     }
 
-    static func update(model: Model, msg: Home.Msg) -> (Model, AnyPublisher<Msg, Never>) {
+    static func update(model: Model, msg: Msg) -> (Model, AnyPublisher<Msg, Never>) {
         switch msg {
         case let .gotArticles(articles):
             return (model.copy(articles: articles), Empty().eraseToAnyPublisher())
@@ -42,11 +42,15 @@ struct Home {
 
     struct view: View {
         let model: Model
+        let navigateTo: (Page) -> Void
 
         var body: some View {
-
             NavigationView {
                 List {
+                    Button("Go to yolo page.") {
+                        self.navigateTo(Page.yolo)
+                    }
+
                     if model.articles.isEmpty {
                         Text("Loading...")
                     } else {
