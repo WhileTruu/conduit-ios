@@ -7,14 +7,12 @@ import Combine
 struct Yolo {
     // MARK: MODEL
 
-    struct Model {
+    static func create() -> Model {
+        Model(messageText: "Wassup")
     }
 
-    static func start() -> (Model, AnyPublisher<Msg, Never>) {
-        (
-            Model()
-            , Empty().eraseToAnyPublisher()
-        )
+    struct Model {
+        let messageText: String
     }
 
     // MARK: UPDATE
@@ -28,18 +26,22 @@ struct Yolo {
 
     // MARK: VIEW
 
-    struct view: View {
-        let model: Model
-        let navigateTo: (Page) -> Void
+    struct ContainerView: View {
+        @EnvironmentObject var app: Store<Conduit.Model, Conduit.Msg>
 
         var body: some View {
-            HStack {
-                Text("Wassup")
+            view(model: app.model.yolo)
+        }
+    }
 
-                Button("Go to yolo page.") {
-                    self.navigateTo(Page.home)
-                }
+    private struct view: View {
+        let model: Model
+
+        var body: some View {
+            List {
+                Text(model.messageText)
             }
+                .navigationBarTitle(Text("Yolo"))
         }
     }
 }

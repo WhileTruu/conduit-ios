@@ -9,20 +9,8 @@ struct Home {
         let articles: [Article]
     }
 
-    static func start() -> (Model, AnyPublisher<Msg, Never>) {
-        (
-            Model(articles: []),
-            Article.fetchFeed()
-                .mapError { (error: Error) -> Error in
-                    print("Error: \(error.localizedDescription))")
-                    return error
-                }
-                .replaceError(with: [])
-                .map { articles in
-                    Msg.gotArticles(articles: articles)
-                }
-                .eraseToAnyPublisher()
-        )
+    static func create() -> (Model, AnyPublisher<Msg, Never>) {
+        (Model(articles: []), fetchFeed())
     }
 
     // MARK: UPDATE
@@ -33,23 +21,38 @@ struct Home {
 
     static func update(model: Model, msg: Msg) -> (Model, AnyPublisher<Msg, Never>) {
         switch msg {
-        case let .gotArticles(articles):
+        case .gotArticles(let articles):
             return (model.copy(articles: articles), Empty().eraseToAnyPublisher())
         }
     }
 
+    static private func fetchFeed() -> AnyPublisher<Msg, Never> {
+        Article.fetchFeed()
+            .replaceError(with: [])
+            .map(Msg.gotArticles)
+            .eraseToAnyPublisher()
+    }
+
     // MARK: VIEW
 
-    struct view: View {
-        let model: Model
-        let navigateTo: (Page) -> Void
+    struct ContainerView: View {
+        @EnvironmentObject var app: Store<Conduit.Model, Conduit.Msg>
+
+        var body: some View {
+            view(model: app.model.home, send: { self.app.send(.homeMsg($0)) })
+        }
+    }
+
+    private struct view: View {
+        let model : Model
+        let send : (Msg) -> Void
 
         var body: some View {
             NavigationView {
                 List {
-                    Button("Go to yolo page.") {
-                        self.navigateTo(Page.yolo)
-                    }
+                    NavigationLink(destination: Yolo.ContainerView(), label: {
+                        Text("To YOOOLO PAGE!")
+                    })
 
                     if model.articles.isEmpty {
                         Text("Loading...")
@@ -59,7 +62,7 @@ struct Home {
                         }
                     }
                 }
-                    .navigationBarTitle(Text("Conduit"))
+                    .navigationBarTitle(Text("Home"))
             }
         }
     }
