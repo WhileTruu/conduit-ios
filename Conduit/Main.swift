@@ -4,53 +4,34 @@ import SwiftUI
 // MARK: MODEL
 
 struct Model {
-    let home: Home.Model
-    let yolo: ArticlePage.Model
+    let articles: [Article]
 }
 
 // MARK: UPDATE
 
 enum Msg {
-    case homeMsg(Home.Msg)
-    case yoloMsg(ArticlePage.Msg)
-}
-
-private func updateWith<SubModel, Model, SubMsg, Msg>(
-    _ toModel: (SubModel) -> Model,
-    _ toMsg: @escaping (SubMsg) -> Msg,
-    _ result: (SubModel, AnyPublisher<SubMsg, Never>)
-) -> (Model, AnyPublisher<Msg, Never>) {
-    (toModel(result.0), result.1.map {
-        toMsg($0)
-    }.eraseToAnyPublisher())
+    case gotArticles(articles: [Article])
 }
 
 func update(model: Model, msg: Msg) -> (Model, AnyPublisher<Msg, Never>) {
     switch msg {
-    case let .homeMsg(pageMsg):
-        return updateWith(
-            { Model(home: $0, yolo: model.yolo) },
-            Msg.homeMsg,
-            Home.update(model: model.home, msg: pageMsg)
-        )
-
-    case let .yoloMsg(pageMsg):
-        return updateWith(
-            { Model(home: model.home, yolo: $0) },
-            Msg.yoloMsg,
-            ArticlePage.update(model: model.yolo, msg: pageMsg)
-        )
+    case .gotArticles(let articles):
+        return (Model(articles: articles), Empty().eraseToAnyPublisher())
     }
+}
+
+private func fetchFeed() -> AnyPublisher<Msg, Never> {
+    Article.fetchFeed()
+        .replaceError(with: [])
+        .map(Msg.gotArticles)
+        .eraseToAnyPublisher()
 }
 
 // MARK: STORE
 
 func createStore() -> Store<Model, Msg> {
-    let (home, homeEffect) = Home.create()
-    let yolo = ArticlePage.create()
-
-    let model = Model(home: home, yolo: yolo)
-    let effect = homeEffect.map(Msg.homeMsg).eraseToAnyPublisher()
+    let model = Model(articles: [])
+    let effect = fetchFeed()
 
     return Store(model: model, effect: effect, update: update)
 }
