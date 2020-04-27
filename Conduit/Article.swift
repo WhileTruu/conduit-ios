@@ -70,7 +70,7 @@ extension Article: Identifiable {
     }
 }
 
-// MARK Article.Slug
+// MARK: Article.Slug
 
 extension Article {
     struct Slug: Hashable {
