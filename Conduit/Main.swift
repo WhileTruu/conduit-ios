@@ -5,14 +5,14 @@ import SwiftUI
 
 struct Model {
     let home: Home.Model
-    let yolo: Yolo.Model
+    let yolo: ArticlePage.Model
 }
 
 // MARK: UPDATE
 
 enum Msg {
     case homeMsg(Home.Msg)
-    case yoloMsg(Yolo.Msg)
+    case yoloMsg(ArticlePage.Msg)
 }
 
 private func updateWith<SubModel, Model, SubMsg, Msg>(
@@ -38,7 +38,7 @@ func update(model: Model, msg: Msg) -> (Model, AnyPublisher<Msg, Never>) {
         return updateWith(
             { Model(home: model.home, yolo: $0) },
             Msg.yoloMsg,
-            Yolo.update(model: model.yolo, msg: pageMsg)
+            ArticlePage.update(model: model.yolo, msg: pageMsg)
         )
     }
 }
@@ -47,7 +47,7 @@ func update(model: Model, msg: Msg) -> (Model, AnyPublisher<Msg, Never>) {
 
 func createStore() -> Store<Model, Msg> {
     let (home, homeEffect) = Home.create()
-    let yolo = Yolo.create()
+    let yolo = ArticlePage.create()
 
     let model = Model(home: home, yolo: yolo)
     let effect = homeEffect.map(Msg.homeMsg).eraseToAnyPublisher()

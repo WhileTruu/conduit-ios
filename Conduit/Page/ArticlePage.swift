@@ -4,7 +4,7 @@ import Foundation
 import SwiftUI
 import Combine
 
-struct Yolo {
+struct ArticlePage {
     // MARK: MODEL
 
     static func create() -> Model {
@@ -28,20 +28,26 @@ struct Yolo {
 
     struct ContainerView: View {
         @EnvironmentObject var app: Store<Conduit.Model, Conduit.Msg>
+        let article: Article
 
         var body: some View {
-            view(model: app.model.yolo)
+            view(model: app.model.yolo, article: article)
         }
     }
 
     private struct view: View {
         let model: Model
+        let article: Article
 
         var body: some View {
-            List {
-                Text(model.messageText)
+            VStack(alignment: .leading) {
+                Text(article.title).font(.title)
+                Text(article.description).font(.headline)
+                Text(article.body).font(.body)
             }
-                .navigationBarTitle(Text("Yolo"))
+                .padding()
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+                .navigationBarTitle("Article")
         }
     }
 }
