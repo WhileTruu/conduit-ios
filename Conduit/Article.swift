@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 
 struct Article: Decodable {
     struct Author: Decodable {

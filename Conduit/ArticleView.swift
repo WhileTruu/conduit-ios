@@ -9,9 +9,12 @@ struct ArticleView: View {
             Text(article.description).font(.headline)
             Text(article.body).font(.body)
         }
-            .padding()
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
-            .navigationBarTitle("Article")
+        .padding()
+        .frame(
+            minWidth: 0, maxWidth: .infinity, minHeight: 0,
+            maxHeight: .infinity, alignment: .topLeading
+        )
+        .navigationBarTitle("Article")
     }
 }
 
@@ -20,7 +23,8 @@ struct ArticleView_Previews: PreviewProvider {
         slug: Article.Slug("rocket-progress"),
         title: "Rocket progress",
         description: "Space must go faster",
-        body: "Harasho progress, but 18 years to launch our first comrades is a long time. Technology must advance faster or there will be no kolkhoz on the red planet in our lifetime.",
+        body:
+            "Harasho progress, but 18 years to launch our first comrades is a long time. Technology must advance faster or there will be no kolkhoz on the red planet in our lifetime.",
         tagList: [""],
         createdAt: Date(timeIntervalSinceNow: -7200),
         updatedAt: Date(timeIntervalSinceNow: -3600),
@@ -33,7 +37,7 @@ struct ArticleView_Previews: PreviewProvider {
             following: true
         )
     )
-    
+
     static var previews: some View {
         ArticleView(article: article)
     }
