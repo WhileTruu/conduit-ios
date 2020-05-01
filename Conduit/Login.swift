@@ -134,13 +134,41 @@ private struct LoginView: View {
             set: { self.send(.EnteredPassword($0)) }
         )
 
-        return VStack {
-            TextField("Username", text: email).autocapitalization(.none)
-            TextField("Password", text: password).autocapitalization(.none)
+        return VStack(spacing: 8) {
+            TextField("Username", text: email)
+                .textFieldStyle(LoginTextFieldStyle())
+                .autocapitalization(.none)
+            SecureField("Password", text: password)
+                .autocapitalization(.none)
+                .textFieldStyle(LoginTextFieldStyle())
 
-            Button(action: { self.send(.SubmittedForm) }) { Text("Button") }
-        }.navigationBarTitle("Log in")
+            Button(action: { self.send(.SubmittedForm) }) {
+                Text("Button")
+            }
+            .buttonStyle(LoginButtonStyle())
+        }
+        .padding()
+        .navigationBarTitle("Log in")
+    }
+}
 
+private struct LoginTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .padding(8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(Color.gray, lineWidth: 1))
+    }
+}
+
+private struct LoginButtonStyle: ButtonStyle {
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label
+            .padding(8)
+            .foregroundColor(Color.white)
+            .background(Color.green)
+            .cornerRadius(8)
     }
 }
 
