@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		367590AE907570E16B2E8631 /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36759E51AA68DDEED7977B5B /* Home.swift */; };
+		367591303F607BABB8D72819 /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3675908DBB5CA787D350819D /* Http.swift */; };
+		3675953BA0574C79747CDF2E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36759FD7C30ED6DD4D40841D /* User.swift */; };
 		36759EE2A80CAFB894B69F3A /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367591B7E236149862A981A1 /* ArticleView.swift */; };
 		6B3880A72458B22600567DE6 /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3880A62458B22600567DE6 /* Authentication.swift */; };
 		6B3880A92458B3A700567DE6 /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3880A82458B3A700567DE6 /* SignUp.swift */; };
@@ -22,8 +24,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3675908DBB5CA787D350819D /* Http.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
 		367591B7E236149862A981A1 /* ArticleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
 		36759E51AA68DDEED7977B5B /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
+		36759FD7C30ED6DD4D40841D /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		6B3880A62458B22600567DE6 /* Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
 		6B3880A82458B3A700567DE6 /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		6B6C3A972454809800363BD6 /* Conduit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Conduit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +85,8 @@
 				6BF19EB8245871FD00ABBBF9 /* Login.swift */,
 				6B3880A62458B22600567DE6 /* Authentication.swift */,
 				6B3880A82458B3A700567DE6 /* SignUp.swift */,
+				36759FD7C30ED6DD4D40841D /* User.swift */,
+				3675908DBB5CA787D350819D /* Http.swift */,
 			);
 			path = Conduit;
 			sourceTree = "<group>";
@@ -173,6 +179,8 @@
 				6B3880A72458B22600567DE6 /* Authentication.swift in Sources */,
 				6B3880A92458B3A700567DE6 /* SignUp.swift in Sources */,
 				36759EE2A80CAFB894B69F3A /* ArticleView.swift in Sources */,
+				3675953BA0574C79747CDF2E /* User.swift in Sources */,
+				367591303F607BABB8D72819 /* Http.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +318,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Conduit/Preview Content\"";
+				DEVELOPMENT_TEAM = 9WQRXY32JD;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Conduit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -329,6 +338,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Conduit/Preview Content\"";
+				DEVELOPMENT_TEAM = 9WQRXY32JD;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Conduit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

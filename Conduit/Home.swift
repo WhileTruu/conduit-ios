@@ -14,7 +14,7 @@ struct Home {
         case gotArticles(articles: [Article])
     }
 
-    static func update(model: Model, msg: Msg) -> (
+    static func update(msg: Msg, model: Model) -> (
         Model, AnyPublisher<Msg, Never>
     ) {
         switch msg {
@@ -36,7 +36,7 @@ struct Home {
 
     // STORE
 
-    static func createStore() -> Store<Model, Msg> {
+    static func createStore() -> Store<Msg, Model> {
         let model = Model(articles: [])
         let effect = fetchFeed()
 

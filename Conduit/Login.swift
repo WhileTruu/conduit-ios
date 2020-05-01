@@ -7,11 +7,17 @@ struct Login {
     struct Model {
         let email: String
         let password: String
+        let loginResult: Result<User, Http.Error>?
 
-        func copy(email: String? = nil, password: String? = nil) -> Model {
+        func copy(
+            email: String? = nil,
+            password: String? = nil,
+            loginResult: Result<User, Http.Error>? = nil
+        ) -> Model {
             Model(
                 email: email ?? self.email,
-                password: password ?? self.password
+                password: password ?? self.password,
+                loginResult: loginResult ?? self.loginResult
             )
         }
     }
@@ -22,24 +28,35 @@ struct Login {
         case EnteredEmail(_ email: String)
         case EnteredPassword(_ password: String)
         case SubmittedForm
-        case CompletedLogin
+        case CompletedLogin(_ result: Result<User, Http.Error>)
     }
 
-    static func update(
-        model: Model,
-        msg: Msg
-    ) -> (Model, AnyPublisher<Msg, Never>) {
+    static func update(msg: Msg, model: Model) -> (
+        Model, AnyPublisher<Msg, Never>
+    ) {
         switch msg {
         case .EnteredEmail(let email):
             return (model.copy(email: email), Empty().eraseToAnyPublisher())
 
         case .EnteredPassword(let password):
             return (
-                model.copy(password: password), Empty().eraseToAnyPublisher()
+                model.copy(password: password),
+                Empty().eraseToAnyPublisher()
             )
 
-        case _:
-            return (model, Empty().eraseToAnyPublisher())
+        case .SubmittedForm:
+            return (
+                model,
+                login(email: model.email, password: model.password)
+                    .map(Msg.CompletedLogin)
+                    .eraseToAnyPublisher()
+            )
+
+        case .CompletedLogin(let result):
+            return (
+                model.copy(loginResult: result),
+                Empty().eraseToAnyPublisher()
+            )
         }
     }
 
@@ -49,20 +66,56 @@ struct Login {
 
     // STORE
 
-    static func createStore() -> Store<Model, Msg> {
+    static func createStore() -> Store<Msg, Model> {
         Store(
-            model: Login.Model(email: "", password: ""),
+            model: Login.Model(email: "", password: "", loginResult: nil),
             effect: Empty().eraseToAnyPublisher(),
-            update: Login.update
+            update: { msg, model in
+                let x = Login.update(msg: msg, model: model)
+                print(x.0)
+                return x
+            }
         )
     }
 }
 
+private func login(email: String, password: String) -> AnyPublisher<
+    Result<User, Http.Error>, Never
+> {
+    guard
+        let url = URL(
+            string: "https://conduit.productionready.io/api/users/login")
+    else { preconditionFailure() }
+
+    return Http.post(
+        url: url,
+        body: createLoginRequestBody(email: email, password: password)
+    )
+    .map(Result.success)
+    .catch { Just(Result.failure($0)) }
+    .eraseToAnyPublisher()
+}
+
+private func createLoginRequestBody(email: String, password: String) -> Data? {
+    let json: [String: Any] = ["user": ["email": email, "password": password]]
+
+    do {
+        return try JSONSerialization.data(withJSONObject: json, options: [])
+    } catch {
+        return nil
+    }
+}
+
 private struct LoginViewHost: View {
-    @ObservedObject var store = Login.createStore()
+    @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var store: Store = Login.createStore()
 
     var body: some View {
-        LoginView(model: store.model, send: store.send)
+        if case .success = store.model.loginResult {
+            self.presentationMode.wrappedValue.dismiss()
+        }
+
+        return LoginView(model: store.model, send: store.send)
     }
 }
 
@@ -82,11 +135,10 @@ private struct LoginView: View {
         )
 
         return VStack {
-            TextField("Username", text: email)
-            TextField("Password", text: password)
-            Button(action: {}) {
-                Text("Button")
-            }
+            TextField("Username", text: email).autocapitalization(.none)
+            TextField("Password", text: password).autocapitalization(.none)
+
+            Button(action: { self.send(.SubmittedForm) }) { Text("Button") }
         }.navigationBarTitle("Log in")
 
     }
@@ -95,7 +147,9 @@ private struct LoginView: View {
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView(
-            model: Login.Model(email: "butt@dragon.io", password: "dragonbutt"),
+            model: Login.Model(
+                email: "email@email.io", password: "password",
+                loginResult: nil),
             send: { _ in }
         )
     }

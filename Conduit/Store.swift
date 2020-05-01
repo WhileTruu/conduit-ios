@@ -1,16 +1,16 @@
 import Combine
 import SwiftUI
 
-final class Store<Model, Msg>: ObservableObject {
+final class Store<Msg, Model>: ObservableObject {
     @Published private(set) var model: Model
 
-    private let update: (Model, Msg) -> (Model, AnyPublisher<Msg, Never>)
+    private let update: (Msg, Model) -> (Model, AnyPublisher<Msg, Never>)
     private var effectCancellables: Set<AnyCancellable> = []
 
     init(
         model: Model,
         effect: AnyPublisher<Msg, Never>,
-        update: @escaping (Model, Msg) -> (Model, AnyPublisher<Msg, Never>)
+        update: @escaping (Msg, Model) -> (Model, AnyPublisher<Msg, Never>)
     ) {
         self.update = update
 
@@ -22,7 +22,7 @@ final class Store<Model, Msg>: ObservableObject {
     }
 
     func send(_ msg: Msg) {
-        let (model, effect) = update(self.model, msg)
+        let (model, effect) = update(msg, self.model)
 
         self.model = model
         effect

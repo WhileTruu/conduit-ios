@@ -23,13 +23,10 @@ struct Authentication {
         case ReplacedView(_ hostedView: HostedView)
     }
 
-    static func update(model: Model, msg: Msg) -> Model {
+    static func update(msg: Msg, model: Model) -> Model {
         switch msg {
         case .ReplacedView(let hostedView):
             return (model.copy(hostedView: hostedView))
-
-        case _:
-            return model
         }
     }
 
@@ -39,12 +36,12 @@ struct Authentication {
 
     // STORE
 
-    static func createStore() -> Store<Model, Msg> {
-        Store<Model, Msg>(
+    static func createStore() -> Store<Msg, Model> {
+        Store(
             model: Model(hostedView: .SignUp),
             effect: Empty().eraseToAnyPublisher(),
-            update: { model, msg in
-                (update(model: model, msg: msg), Empty().eraseToAnyPublisher())
+            update: {
+                (update(msg: $0, model: $1), Empty().eraseToAnyPublisher())
             }
         )
     }
