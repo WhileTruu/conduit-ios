@@ -39,10 +39,8 @@ struct Authentication {
     static func createStore() -> Store<Msg, Model> {
         Store(
             model: Model(hostedView: .SignUp),
-            effect: Empty().eraseToAnyPublisher(),
-            update: {
-                (update(msg: $0, model: $1), Empty().eraseToAnyPublisher())
-            }
+            effect: Pub.none(),
+            update: { (update(msg: $0, model: $1), Pub.none()) }
         )
     }
 }

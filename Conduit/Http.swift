@@ -36,9 +36,7 @@ enum Http {
     }
 
     static func post<T: Decodable>(url: URL, body: Data?, decoder: JSONDecoder)
-        -> AnyPublisher<
-            T, Error
-        >
+        -> AnyPublisher<T, Error>
     {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

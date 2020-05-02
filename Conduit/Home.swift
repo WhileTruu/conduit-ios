@@ -11,23 +11,21 @@ struct Home {
     // UPDATE
 
     enum Msg {
-        case gotArticles(articles: [Article])
+        case GotArticles(articles: [Article])
     }
 
-    static func update(msg: Msg, model: Model) -> (
-        Model, AnyPublisher<Msg, Never>
-    ) {
+    static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
         switch msg {
-        case .gotArticles(let articles):
-            return (Model(articles: articles), Empty().eraseToAnyPublisher())
+        case .GotArticles(let articles):
+            return (Model(articles: articles), Pub.none())
         }
     }
 
-    static func fetchFeed() -> AnyPublisher<Msg, Never> {
+    static func fetchFeed() -> Pub<Msg> {
         Article.fetchFeed()
             .replaceError(with: [])
-            .map(Msg.gotArticles)
-            .eraseToAnyPublisher()
+            .map(Msg.GotArticles)
+            .toPub()
     }
 
     // VIEW

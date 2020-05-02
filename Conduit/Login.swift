@@ -34,26 +34,16 @@ struct Login {
         case NoOp
     }
 
-    static func update(msg: Msg, model: Model) -> (
-        Model, AnyPublisher<Msg, Never>
-    ) {
+    static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
         switch msg {
         case .EnteredEmail(let email):
-            return (model.copy(email: email), Empty().eraseToAnyPublisher())
+            return (model.copy(email: email), Pub.none())
 
         case .EnteredPassword(let password):
-            return (
-                model.copy(password: password),
-                Empty().eraseToAnyPublisher()
-            )
+            return (model.copy(password: password), Pub.none())
 
         case .SubmittedForm:
-            return (
-                model,
-                login(email: model.email, password: model.password)
-                    .map(Msg.CompletedLogin)
-                    .eraseToAnyPublisher()
-            )
+            return (model, login(email: model.email, password: model.password))
 
         case .CompletedLogin(.success(let user)):
             return (
@@ -61,20 +51,14 @@ struct Login {
                 user.saveToKeychainPublisher()
                     .map { Msg.SavedToKeychainSuccess(user) }
                     .catch { _ in Just(Msg.FailedSaveToKeychain(user)) }
-                    .eraseToAnyPublisher()
+                    .toPub()
             )
 
         case .CompletedLogin(.failure(let error)):
-            return (
-                model.copy(loginResult: .failure(error)),
-                Empty().eraseToAnyPublisher()
-            )
+            return (model.copy(loginResult: .failure(error)), Pub.none())
 
         case .SavedToKeychainSuccess(let user):
-            return (
-                model.copy(loginResult: .success(user)),
-                Empty().eraseToAnyPublisher()
-            )
+            return (model.copy(loginResult: .success(user)), Pub.none())
 
         case .FailedSaveToKeychain(let user):
             return (
@@ -82,11 +66,11 @@ struct Login {
                 User.deleteFromKeychainPublisher()
                     .map { Msg.NoOp }
                     .catch { _ in Just(Msg.NoOp) }
-                    .eraseToAnyPublisher()
+                    .toPub()
             )
 
         case .NoOp:
-            return (model, Empty().eraseToAnyPublisher())
+            return (model, Pub.none())
         }
     }
 
@@ -99,15 +83,13 @@ struct Login {
     static func createStore() -> Store<Msg, Model> {
         Store(
             model: Login.Model(email: "", password: "", loginResult: nil),
-            effect: Empty().eraseToAnyPublisher(),
+            effect: Pub.none(),
             update: Login.update
         )
     }
 }
 
-private func login(email: String, password: String) -> AnyPublisher<
-    Result<User, Http.Error>, Never
-> {
+private func login(email: String, password: String) -> Pub<Login.Msg> {
     guard
         let url = URL(
             string: "https://conduit.productionready.io/api/users/login"
@@ -121,7 +103,8 @@ private func login(email: String, password: String) -> AnyPublisher<
     )
     .map(Result.success)
     .catch { Just(Result.failure($0)) }
-    .eraseToAnyPublisher()
+    .map(Login.Msg.CompletedLogin)
+    .toPub()
 }
 
 private func createLoginRequestBody(email: String, password: String) -> Data? {
