@@ -29,6 +29,9 @@ struct Login {
         case EnteredPassword(_ password: String)
         case SubmittedForm
         case CompletedLogin(_ result: Result<User, Http.Error>)
+        case SavedToKeychainSuccess(_ user: User)
+        case FailedSaveToKeychain(_ user: User)
+        case NoOp
     }
 
     static func update(msg: Msg, model: Model) -> (
@@ -52,11 +55,38 @@ struct Login {
                     .eraseToAnyPublisher()
             )
 
-        case .CompletedLogin(let result):
+        case .CompletedLogin(.success(let user)):
             return (
-                model.copy(loginResult: result),
+                model,
+                user.saveToKeychainPublisher()
+                    .map { Msg.SavedToKeychainSuccess(user) }
+                    .catch { _ in Just(Msg.FailedSaveToKeychain(user)) }
+                    .eraseToAnyPublisher()
+            )
+
+        case .CompletedLogin(.failure(let error)):
+            return (
+                model.copy(loginResult: .failure(error)),
                 Empty().eraseToAnyPublisher()
             )
+
+        case .SavedToKeychainSuccess(let user):
+            return (
+                model.copy(loginResult: .success(user)),
+                Empty().eraseToAnyPublisher()
+            )
+
+        case .FailedSaveToKeychain(let user):
+            return (
+                model.copy(loginResult: .success(user)),
+                User.deleteFromKeychainPublisher()
+                    .map { Msg.NoOp }
+                    .catch { _ in Just(Msg.NoOp) }
+                    .eraseToAnyPublisher()
+            )
+
+        case .NoOp:
+            return (model, Empty().eraseToAnyPublisher())
         }
     }
 
@@ -70,11 +100,7 @@ struct Login {
         Store(
             model: Login.Model(email: "", password: "", loginResult: nil),
             effect: Empty().eraseToAnyPublisher(),
-            update: { msg, model in
-                let x = Login.update(msg: msg, model: model)
-                print(x.0)
-                return x
-            }
+            update: Login.update
         )
     }
 }
@@ -84,12 +110,14 @@ private func login(email: String, password: String) -> AnyPublisher<
 > {
     guard
         let url = URL(
-            string: "https://conduit.productionready.io/api/users/login")
+            string: "https://conduit.productionready.io/api/users/login"
+        )
     else { preconditionFailure() }
 
     return Http.post(
         url: url,
-        body: createLoginRequestBody(email: email, password: password)
+        body: createLoginRequestBody(email: email, password: password),
+        decoder: JSONDecoder()
     )
     .map(Result.success)
     .catch { Just(Result.failure($0)) }
@@ -158,7 +186,8 @@ private struct LoginTextFieldStyle: TextFieldStyle {
             .padding(8)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color.gray, lineWidth: 1))
+                    .strokeBorder(Color.gray, lineWidth: 1)
+            )
     }
 }
 
@@ -176,8 +205,10 @@ struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView(
             model: Login.Model(
-                email: "email@email.io", password: "password",
-                loginResult: nil),
+                email: "email@email.io",
+                password: "password",
+                loginResult: nil
+            ),
             send: { _ in }
         )
     }

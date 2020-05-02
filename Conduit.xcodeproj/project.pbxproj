@@ -11,6 +11,7 @@
 		367591303F607BABB8D72819 /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3675908DBB5CA787D350819D /* Http.swift */; };
 		3675953BA0574C79747CDF2E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36759FD7C30ED6DD4D40841D /* User.swift */; };
 		36759EE2A80CAFB894B69F3A /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367591B7E236149862A981A1 /* ArticleView.swift */; };
+		6B0575B8245D8C750068B3E2 /* ConduitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0575B7245D8C750068B3E2 /* ConduitTests.swift */; };
 		6B3880A72458B22600567DE6 /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3880A62458B22600567DE6 /* Authentication.swift */; };
 		6B3880A92458B3A700567DE6 /* SignUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3880A82458B3A700567DE6 /* SignUp.swift */; };
 		6B6C3A9B2454809800363BD6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6C3A9A2454809800363BD6 /* AppDelegate.swift */; };
@@ -23,11 +24,31 @@
 		6BF19EB9245871FD00ABBBF9 /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BF19EB8245871FD00ABBBF9 /* Login.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		6B0575BA245D8C750068B3E2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6B6C3A8F2454809800363BD6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6B6C3A962454809800363BD6;
+			remoteInfo = Conduit;
+		};
+		6BF56F02245DA1A600EAF5DE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6B6C3A8F2454809800363BD6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6B6C3A962454809800363BD6;
+			remoteInfo = Conduit;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		3675908DBB5CA787D350819D /* Http.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
 		367591B7E236149862A981A1 /* ArticleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
 		36759E51AA68DDEED7977B5B /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		36759FD7C30ED6DD4D40841D /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		6B0575B5245D8C750068B3E2 /* ConduitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConduitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B0575B7245D8C750068B3E2 /* ConduitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConduitTests.swift; sourceTree = "<group>"; };
+		6B0575B9245D8C750068B3E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6B3880A62458B22600567DE6 /* Authentication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authentication.swift; sourceTree = "<group>"; };
 		6B3880A82458B3A700567DE6 /* SignUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUp.swift; sourceTree = "<group>"; };
 		6B6C3A972454809800363BD6 /* Conduit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Conduit.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -39,11 +60,27 @@
 		6B6C3AA82454809A00363BD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6B6C3AB02454813D00363BD6 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		6B6C3AB22454817600363BD6 /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
+		6BEB2703245C8DB3005AD75A /* Conduit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Conduit.entitlements; sourceTree = "<group>"; };
 		6BF19EB8245871FD00ABBBF9 /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
+		6BF56EFD245DA1A600EAF5DE /* Yolotests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Yolotests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6B0575B2245D8C750068B3E2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6B6C3A942454809800363BD6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BF56EFA245DA1A600EAF5DE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -53,10 +90,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6B0575B6245D8C750068B3E2 /* ConduitTests */ = {
+			isa = PBXGroup;
+			children = (
+				6B0575B7245D8C750068B3E2 /* ConduitTests.swift */,
+				6B0575B9245D8C750068B3E2 /* Info.plist */,
+			);
+			path = ConduitTests;
+			sourceTree = "<group>";
+		};
 		6B6C3A8E2454809800363BD6 = {
 			isa = PBXGroup;
 			children = (
 				6B6C3A992454809800363BD6 /* Conduit */,
+				6B0575B6245D8C750068B3E2 /* ConduitTests */,
 				6B6C3A982454809800363BD6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +112,8 @@
 			isa = PBXGroup;
 			children = (
 				6B6C3A972454809800363BD6 /* Conduit.app */,
+				6B0575B5245D8C750068B3E2 /* ConduitTests.xctest */,
+				6BF56EFD245DA1A600EAF5DE /* Yolotests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,6 +121,7 @@
 		6B6C3A992454809800363BD6 /* Conduit */ = {
 			isa = PBXGroup;
 			children = (
+				6BEB2703245C8DB3005AD75A /* Conduit.entitlements */,
 				6B6C3A9A2454809800363BD6 /* AppDelegate.swift */,
 				6B6C3A9C2454809800363BD6 /* SceneDelegate.swift */,
 				6B6C3AA02454809A00363BD6 /* Assets.xcassets */,
@@ -102,6 +152,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6B0575B4245D8C750068B3E2 /* ConduitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6B0575BE245D8C750068B3E2 /* Build configuration list for PBXNativeTarget "ConduitTests" */;
+			buildPhases = (
+				6B0575B1245D8C750068B3E2 /* Sources */,
+				6B0575B2245D8C750068B3E2 /* Frameworks */,
+				6B0575B3245D8C750068B3E2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6B0575BB245D8C750068B3E2 /* PBXTargetDependency */,
+			);
+			name = ConduitTests;
+			productName = ConduitTests;
+			productReference = 6B0575B5245D8C750068B3E2 /* ConduitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		6B6C3A962454809800363BD6 /* Conduit */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6B6C3AAB2454809A00363BD6 /* Build configuration list for PBXNativeTarget "Conduit" */;
@@ -119,6 +187,24 @@
 			productReference = 6B6C3A972454809800363BD6 /* Conduit.app */;
 			productType = "com.apple.product-type.application";
 		};
+		6BF56EFC245DA1A600EAF5DE /* Yolotests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6BF56F06245DA1A600EAF5DE /* Build configuration list for PBXNativeTarget "Yolotests" */;
+			buildPhases = (
+				6BF56EF9245DA1A600EAF5DE /* Sources */,
+				6BF56EFA245DA1A600EAF5DE /* Frameworks */,
+				6BF56EFB245DA1A600EAF5DE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6BF56F03245DA1A600EAF5DE /* PBXTargetDependency */,
+			);
+			name = Yolotests;
+			productName = Yolotests;
+			productReference = 6BF56EFD245DA1A600EAF5DE /* Yolotests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -129,8 +215,16 @@
 				LastUpgradeCheck = 1140;
 				ORGANIZATIONNAME = "Marten Truu";
 				TargetAttributes = {
+					6B0575B4245D8C750068B3E2 = {
+						CreatedOnToolsVersion = 11.4.1;
+						TestTargetID = 6B6C3A962454809800363BD6;
+					};
 					6B6C3A962454809800363BD6 = {
 						CreatedOnToolsVersion = 11.4.1;
+					};
+					6BF56EFC245DA1A600EAF5DE = {
+						CreatedOnToolsVersion = 11.4.1;
+						TestTargetID = 6B6C3A962454809800363BD6;
 					};
 				};
 			};
@@ -148,11 +242,20 @@
 			projectRoot = "";
 			targets = (
 				6B6C3A962454809800363BD6 /* Conduit */,
+				6B0575B4245D8C750068B3E2 /* ConduitTests */,
+				6BF56EFC245DA1A600EAF5DE /* Yolotests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6B0575B3245D8C750068B3E2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6B6C3A952454809800363BD6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -163,9 +266,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6BF56EFB245DA1A600EAF5DE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6B0575B1245D8C750068B3E2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B0575B8245D8C750068B3E2 /* ConduitTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6B6C3A932454809800363BD6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -184,7 +302,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6BF56EF9245DA1A600EAF5DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6B0575BB245D8C750068B3E2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6B6C3A962454809800363BD6 /* Conduit */;
+			targetProxy = 6B0575BA245D8C750068B3E2 /* PBXContainerItemProxy */;
+		};
+		6BF56F03245DA1A600EAF5DE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6B6C3A962454809800363BD6 /* Conduit */;
+			targetProxy = 6BF56F02245DA1A600EAF5DE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		6B6C3AA52454809A00363BD6 /* LaunchScreen.storyboard */ = {
@@ -198,6 +336,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		6B0575BC245D8C750068B3E2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = ConduitTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.whiletruu.ConduitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Conduit.app/Conduit";
+			};
+			name = Debug;
+		};
+		6B0575BD245D8C750068B3E2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = ConduitTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.whiletruu.ConduitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Conduit.app/Conduit";
+			};
+			name = Release;
+		};
 		6B6C3AA92454809A00363BD6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -316,6 +492,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Conduit/Conduit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Conduit/Preview Content\"";
 				DEVELOPMENT_TEAM = 9WQRXY32JD;
@@ -336,6 +513,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Conduit/Conduit.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Conduit/Preview Content\"";
 				DEVELOPMENT_TEAM = 9WQRXY32JD;
@@ -352,9 +530,56 @@
 			};
 			name = Release;
 		};
+		6BF56F04245DA1A600EAF5DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Yolotests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.whiletruu.Yolotests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Conduit.app/Conduit";
+			};
+			name = Debug;
+		};
+		6BF56F05245DA1A600EAF5DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Yolotests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.whiletruu.Yolotests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Conduit.app/Conduit";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6B0575BE245D8C750068B3E2 /* Build configuration list for PBXNativeTarget "ConduitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6B0575BC245D8C750068B3E2 /* Debug */,
+				6B0575BD245D8C750068B3E2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		6B6C3A922454809800363BD6 /* Build configuration list for PBXProject "Conduit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -369,6 +594,15 @@
 			buildConfigurations = (
 				6B6C3AAC2454809A00363BD6 /* Debug */,
 				6B6C3AAD2454809A00363BD6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6BF56F06245DA1A600EAF5DE /* Build configuration list for PBXNativeTarget "Yolotests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6BF56F04245DA1A600EAF5DE /* Debug */,
+				6BF56F05245DA1A600EAF5DE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

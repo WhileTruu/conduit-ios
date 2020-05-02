@@ -1,8 +1,8 @@
 import Combine
 import Foundation
 
-struct Article: Decodable {
-    struct Author: Decodable {
+struct Article: Codable {
+    struct Author: Codable {
         let username: String
         let bio: String?
         let image: String
@@ -35,11 +35,25 @@ extension Article {
 
         guard let url = urlComponents.url else { preconditionFailure() }
 
-        return (Http.get(url: url) as AnyPublisher<Articles, Http.Error>)
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+
+        return
+            (Http.get(url: url, decoder: decoder)
+            as AnyPublisher<Articles, Http.Error>)
             .map(\.articles)
             .eraseToAnyPublisher()
-
     }
+
+    static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+
+        return formatter
+    }()
 }
 
 extension Article: Identifiable {

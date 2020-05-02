@@ -98,7 +98,8 @@ private struct HomeView: View {
 
             VStack(alignment: .leading) {
                 Text(article.author.username).font(
-                    Font.bold(.subheadline)())
+                    Font.bold(.subheadline)()
+                )
                 Text(
                     "\(article.updatedAt, formatter: articleDateFormatter)"
                 )

@@ -8,7 +8,7 @@
   "indentConditionalCompilationBlocks" : true,
   "lineBreakAroundMultilineExpressionChainComponents" : false,
   "lineBreakBeforeControlFlowKeywords" : false,
-  "lineBreakBeforeEachArgument" : false,
+  "lineBreakBeforeEachArgument" : true,
   "lineBreakBeforeEachGenericRequirement" : false,
   "lineLength" : 80,
   "maximumBlankLines" : 1,
