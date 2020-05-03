@@ -43,12 +43,20 @@ struct Home {
 }
 
 private struct HomeViewHost: View {
+    @EnvironmentObject var sessionStore: Store<Session.Msg, Session.Model>
     @ObservedObject var store = Home.createStore()
 
-    var body: some View { HomeView(model: store.model, send: store.send) }
+    var body: some View {
+        HomeView(
+            session: sessionStore.model,
+            model: store.model,
+            send: store.send
+        )
+    }
 }
 
 private struct HomeView: View {
+    var session: Session.Model
     var model: Home.Model
     var send: (Home.Msg) -> Void
 
@@ -107,12 +115,26 @@ private struct HomeView: View {
     }
 
     var profileButton: some View {
-        NavigationLink(destination: Authentication.view()) {
-            Image(systemName: "person.crop.circle")
-                .imageScale(.large)
-                .accessibility(label: Text("User Profile"))
-                .padding()
+
+        HStack {
+            if session.user == nil {
+
+                NavigationLink(destination: Authentication.view()) {
+                    profileImage
+                }
+            } else {
+                NavigationLink(destination: Profile.view()) {
+                    profileImage
+                }
+            }
         }
+    }
+
+    var profileImage: some View {
+        Image(systemName: "person.crop.circle")
+            .imageScale(.large)
+            .accessibility(label: Text("User Profile"))
+            .padding()
     }
 }
 
@@ -141,6 +163,9 @@ struct HomeView_Previews: PreviewProvider {
     static let articles = Array(0...20).map(createArticle)
 
     static var previews: some View {
-        HomeView(model: Home.Model(articles: articles), send: { _ in })
+        let session = Session.Model(user: nil)
+        let model = Home.Model(articles: articles)
+
+        return HomeView(session: session, model: model, send: { _ in })
     }
 }

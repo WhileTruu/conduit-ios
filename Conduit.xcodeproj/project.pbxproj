@@ -10,6 +10,8 @@
 		367590AE907570E16B2E8631 /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36759E51AA68DDEED7977B5B /* Home.swift */; };
 		367591303F607BABB8D72819 /* Http.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3675908DBB5CA787D350819D /* Http.swift */; };
 		3675953BA0574C79747CDF2E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36759FD7C30ED6DD4D40841D /* User.swift */; };
+		367596EEE32292BB4A5E033F /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36759FACB09489F159C2B4F5 /* Session.swift */; };
+		36759A733165DA8B08223DC2 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367596DE63EFC1288C6D5B03 /* Profile.swift */; };
 		36759EE2A80CAFB894B69F3A /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 367591B7E236149862A981A1 /* ArticleView.swift */; };
 		6B0575B8245D8C750068B3E2 /* ConduitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0575B7245D8C750068B3E2 /* ConduitTests.swift */; };
 		6B3880A72458B22600567DE6 /* Authentication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3880A62458B22600567DE6 /* Authentication.swift */; };
@@ -44,7 +46,9 @@
 /* Begin PBXFileReference section */
 		3675908DBB5CA787D350819D /* Http.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Http.swift; sourceTree = "<group>"; };
 		367591B7E236149862A981A1 /* ArticleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
+		367596DE63EFC1288C6D5B03 /* Profile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		36759E51AA68DDEED7977B5B /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
+		36759FACB09489F159C2B4F5 /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		36759FD7C30ED6DD4D40841D /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		6B0575B5245D8C750068B3E2 /* ConduitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConduitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B0575B7245D8C750068B3E2 /* ConduitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConduitTests.swift; sourceTree = "<group>"; };
@@ -137,6 +141,8 @@
 				6B3880A82458B3A700567DE6 /* SignUp.swift */,
 				36759FD7C30ED6DD4D40841D /* User.swift */,
 				3675908DBB5CA787D350819D /* Http.swift */,
+				36759FACB09489F159C2B4F5 /* Session.swift */,
+				367596DE63EFC1288C6D5B03 /* Profile.swift */,
 			);
 			path = Conduit;
 			sourceTree = "<group>";
@@ -174,7 +180,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6B6C3AAB2454809A00363BD6 /* Build configuration list for PBXNativeTarget "Conduit" */;
 			buildPhases = (
-				6BF56F07245EA1F600EAF5DE /* Format */,
 				6B6C3A932454809800363BD6 /* Sources */,
 				6B6C3A942454809800363BD6 /* Frameworks */,
 				6B6C3A952454809800363BD6 /* Resources */,
@@ -276,27 +281,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		6BF56F07245EA1F600EAF5DE /* Format */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = Format;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$HOME/.brew/bin:$HOME/.brew/sbin:$PATH\"\n$SRCROOT/Scripts/format.sh\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		6B0575B1245D8C750068B3E2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -321,6 +305,8 @@
 				36759EE2A80CAFB894B69F3A /* ArticleView.swift in Sources */,
 				3675953BA0574C79747CDF2E /* User.swift in Sources */,
 				367591303F607BABB8D72819 /* Http.swift in Sources */,
+				367596EEE32292BB4A5E033F /* Session.swift in Sources */,
+				36759A733165DA8B08223DC2 /* Profile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

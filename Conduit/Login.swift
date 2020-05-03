@@ -29,9 +29,6 @@ struct Login {
         case enteredPassword(_ password: String)
         case submittedForm
         case completedLogin(_ result: Result<User, Http.Error>)
-        case savedToKeychainSuccess(_ user: User)
-        case failedSaveToKeychain(_ user: User)
-        case noOp
     }
 
     static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
@@ -46,31 +43,10 @@ struct Login {
             return (model, login(email: model.email, password: model.password))
 
         case .completedLogin(.success(let user)):
-            return (
-                model,
-                user.saveToKeychainPublisher()
-                    .map { Msg.savedToKeychainSuccess(user) }
-                    .catch { _ in Just(Msg.failedSaveToKeychain(user)) }
-                    .toPub()
-            )
+            return (model.copy(loginResult: .success(user)), Pub.none())
 
         case .completedLogin(.failure(let error)):
             return (model.copy(loginResult: .failure(error)), Pub.none())
-
-        case .savedToKeychainSuccess(let user):
-            return (model.copy(loginResult: .success(user)), Pub.none())
-
-        case .failedSaveToKeychain(let user):
-            return (
-                model.copy(loginResult: .success(user)),
-                User.deleteFromKeychainPublisher()
-                    .map { Msg.noOp }
-                    .catch { _ in Just(Msg.noOp) }
-                    .toPub()
-            )
-
-        case .noOp:
-            return (model, Pub.none())
         }
     }
 
@@ -81,11 +57,9 @@ struct Login {
     // STORE
 
     static func createStore() -> Store<Msg, Model> {
-        Store(
-            model: Login.Model(email: "", password: "", loginResult: nil),
-            effect: Pub.none(),
-            update: Login.update
-        )
+        let model = Model(email: "", password: "", loginResult: nil)
+
+        return Store(model: model, effect: Pub.none(), update: update)
     }
 }
 
@@ -118,15 +92,23 @@ private func createLoginRequestBody(email: String, password: String) -> Data? {
 }
 
 private struct LoginViewHost: View {
+    @EnvironmentObject var sessionStore: Store<Session.Msg, Session.Model>
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var store: Store = Login.createStore()
 
     var body: some View {
-        if case .success = store.model.loginResult {
+        if case .success(let user) = store.model.loginResult {
             self.presentationMode.wrappedValue.dismiss()
         }
 
         return LoginView(model: store.model, send: store.send)
+            .onDisappear(perform: {
+                if case .success(let user) = self.store.model.loginResult {
+                    return self.sessionStore.send(Session.Msg.savedUser(user))
+                } else {
+                    return self.sessionStore.send(Session.Msg.removedUser)
+                }
+            })
     }
 }
 
