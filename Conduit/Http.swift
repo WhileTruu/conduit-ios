@@ -4,22 +4,22 @@ import Swift
 
 enum Http {
     enum Error: Swift.Error {
-        case SessionError(error: URLError)
-        case BadBody(decodingError: Swift.DecodingError)
-        case BadStatus(status: Int, data: Data)
-        case InvalidResponse(response: URLResponse, data: Data)
-        case Other(Swift.Error)
+        case sessionError(error: URLError)
+        case badBody(decodingError: Swift.DecodingError)
+        case badStatus(status: Int, data: Data)
+        case invalidResponse(response: URLResponse, data: Data)
+        case other(Swift.Error)
 
         static func fromGenericError(_ error: Swift.Error) -> Error {
             switch error {
-            case let decodingError as Swift.DecodingError:
-                return .BadBody(decodingError: decodingError)
-            case let urlError as URLError:
-                return .SessionError(error: urlError)
-            case let httpError as Error:
+            case (let decodingError) as Swift.DecodingError:
+                return .badBody(decodingError: decodingError)
+            case (let urlError) as URLError:
+                return .sessionError(error: urlError)
+            case (let httpError) as Error:
                 return httpError
             default:
-                return .Other(error)
+                return .other(error)
             }
         }
     }
@@ -57,7 +57,7 @@ enum Http {
     ) throws -> URLSession.DataTaskPublisher.Output {
         guard let httpResponse = output.response as? HTTPURLResponse
         else {
-            throw Http.Error.InvalidResponse(
+            throw Http.Error.invalidResponse(
                 response: output.response,
                 data: output.data
             )
@@ -65,7 +65,7 @@ enum Http {
 
         guard httpResponse.statusCode >= 200 && httpResponse.statusCode <= 300
         else {
-            throw Http.Error.BadStatus(
+            throw Http.Error.badStatus(
                 status: httpResponse.statusCode,
                 data: output.data
             )

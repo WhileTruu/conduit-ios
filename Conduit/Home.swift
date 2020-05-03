@@ -11,12 +11,12 @@ struct Home {
     // UPDATE
 
     enum Msg {
-        case GotArticles(articles: [Article])
+        case gotArticles(articles: [Article])
     }
 
     static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
         switch msg {
-        case .GotArticles(let articles):
+        case .gotArticles(let articles):
             return (Model(articles: articles), Pub.none())
         }
     }
@@ -24,7 +24,7 @@ struct Home {
     static func fetchFeed() -> Pub<Msg> {
         Article.fetchFeed()
             .replaceError(with: [])
-            .map(Msg.GotArticles)
+            .map(Msg.gotArticles)
             .toPub()
     }
 

@@ -13,19 +13,19 @@ struct Authentication {
     }
 
     enum HostedView {
-        case SignUp
-        case Login
+        case signUp
+        case login
     }
 
     // UPDATE
 
     enum Msg {
-        case ReplacedView(_ hostedView: HostedView)
+        case replacedView(_ hostedView: HostedView)
     }
 
     static func update(msg: Msg, model: Model) -> Model {
         switch msg {
-        case .ReplacedView(let hostedView):
+        case .replacedView(let hostedView):
             return (model.copy(hostedView: hostedView))
         }
     }
@@ -38,7 +38,7 @@ struct Authentication {
 
     static func createStore() -> Store<Msg, Model> {
         Store(
-            model: Model(hostedView: .SignUp),
+            model: Model(hostedView: .signUp),
             effect: Pub.none(),
             update: { (update(msg: $0, model: $1), Pub.none()) }
         )
@@ -59,13 +59,13 @@ private struct AuthenticationView: View {
 
     var body: some View {
         VStack {
-            if model.hostedView == .SignUp {
-                Button(action: { self.send(.ReplacedView(.Login)) }) {
+            if model.hostedView == .signUp {
+                Button(action: { self.send(.replacedView(.login)) }) {
                     Text("Already have an account?")
                 }
                 SignUp.view()
             } else {
-                Button(action: { self.send(.ReplacedView(.SignUp)) }) {
+                Button(action: { self.send(.replacedView(.signUp)) }) {
                     Text("Need an account?")
                 }
                 Login.view()
@@ -77,7 +77,7 @@ private struct AuthenticationView: View {
 struct AuthenticationView_Previews: PreviewProvider {
     static var previews: some View {
         AuthenticationView(
-            model: Authentication.Model(hostedView: .Login),
+            model: Authentication.Model(hostedView: .login),
             send: { _ in }
         )
     }

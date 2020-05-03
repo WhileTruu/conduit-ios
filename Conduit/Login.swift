@@ -25,51 +25,51 @@ struct Login {
     // UPDATE
 
     enum Msg {
-        case EnteredEmail(_ email: String)
-        case EnteredPassword(_ password: String)
-        case SubmittedForm
-        case CompletedLogin(_ result: Result<User, Http.Error>)
-        case SavedToKeychainSuccess(_ user: User)
-        case FailedSaveToKeychain(_ user: User)
-        case NoOp
+        case enteredEmail(_ email: String)
+        case enteredPassword(_ password: String)
+        case submittedForm
+        case completedLogin(_ result: Result<User, Http.Error>)
+        case savedToKeychainSuccess(_ user: User)
+        case failedSaveToKeychain(_ user: User)
+        case noOp
     }
 
     static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
         switch msg {
-        case .EnteredEmail(let email):
+        case .enteredEmail(let email):
             return (model.copy(email: email), Pub.none())
 
-        case .EnteredPassword(let password):
+        case .enteredPassword(let password):
             return (model.copy(password: password), Pub.none())
 
-        case .SubmittedForm:
+        case .submittedForm:
             return (model, login(email: model.email, password: model.password))
 
-        case .CompletedLogin(.success(let user)):
+        case .completedLogin(.success(let user)):
             return (
                 model,
                 user.saveToKeychainPublisher()
-                    .map { Msg.SavedToKeychainSuccess(user) }
-                    .catch { _ in Just(Msg.FailedSaveToKeychain(user)) }
+                    .map { Msg.savedToKeychainSuccess(user) }
+                    .catch { _ in Just(Msg.failedSaveToKeychain(user)) }
                     .toPub()
             )
 
-        case .CompletedLogin(.failure(let error)):
+        case .completedLogin(.failure(let error)):
             return (model.copy(loginResult: .failure(error)), Pub.none())
 
-        case .SavedToKeychainSuccess(let user):
+        case .savedToKeychainSuccess(let user):
             return (model.copy(loginResult: .success(user)), Pub.none())
 
-        case .FailedSaveToKeychain(let user):
+        case .failedSaveToKeychain(let user):
             return (
                 model.copy(loginResult: .success(user)),
                 User.deleteFromKeychainPublisher()
-                    .map { Msg.NoOp }
-                    .catch { _ in Just(Msg.NoOp) }
+                    .map { Msg.noOp }
+                    .catch { _ in Just(Msg.noOp) }
                     .toPub()
             )
 
-        case .NoOp:
+        case .noOp:
             return (model, Pub.none())
         }
     }
@@ -103,7 +103,7 @@ private func login(email: String, password: String) -> Pub<Login.Msg> {
     )
     .map(Result.success)
     .catch { Just(Result.failure($0)) }
-    .map(Login.Msg.CompletedLogin)
+    .map(Login.Msg.completedLogin)
     .toPub()
 }
 
@@ -137,12 +137,12 @@ private struct LoginView: View {
     var body: some View {
         let email = Binding<String>(
             get: { self.model.email },
-            set: { self.send(.EnteredEmail($0)) }
+            set: { self.send(.enteredEmail($0)) }
         )
 
         let password = Binding<String>(
             get: { self.model.password },
-            set: { self.send(.EnteredPassword($0)) }
+            set: { self.send(.enteredPassword($0)) }
         )
 
         return VStack(spacing: 8) {
@@ -153,7 +153,7 @@ private struct LoginView: View {
                 .autocapitalization(.none)
                 .textFieldStyle(LoginTextFieldStyle())
 
-            Button(action: { self.send(.SubmittedForm) }) {
+            Button(action: { self.send(.submittedForm) }) {
                 Text("Button")
             }
             .buttonStyle(LoginButtonStyle())
