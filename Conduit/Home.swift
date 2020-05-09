@@ -14,18 +14,18 @@ struct Home {
         case gotArticles(articles: [Article])
     }
 
-    static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
+    static func update(msg: Msg, model: Model) -> (Model, Cmd<Msg>) {
         switch msg {
         case .gotArticles(let articles):
-            return (Model(articles: articles), Pub.none())
+            return (Model(articles: articles), Cmd.none())
         }
     }
 
-    static func fetchFeed() -> Pub<Msg> {
+    static func fetchFeed() -> Cmd<Msg> {
         Article.fetchFeed()
             .replaceError(with: [])
             .map(Msg.gotArticles)
-            .toPub()
+            .toCmd()
     }
 
     // VIEW
@@ -43,20 +43,16 @@ struct Home {
 }
 
 private struct HomeViewHost: View {
-    @EnvironmentObject var sessionStore: Store<Session.Msg, Session.Model>
+    @EnvironmentObject var session: Session
     @ObservedObject var store = Home.createStore()
 
     var body: some View {
-        HomeView(
-            session: sessionStore.model,
-            model: store.model,
-            send: store.send
-        )
+        HomeView(session: session, model: store.model, send: store.send)
     }
 }
 
 private struct HomeView: View {
-    var session: Session.Model
+    var session: Session
     var model: Home.Model
     var send: (Home.Msg) -> Void
 
@@ -115,10 +111,8 @@ private struct HomeView: View {
     }
 
     var profileButton: some View {
-
         HStack {
             if session.user == nil {
-
                 NavigationLink(destination: Authentication.view()) {
                     profileImage
                 }
@@ -163,7 +157,7 @@ struct HomeView_Previews: PreviewProvider {
     static let articles = Array(0...20).map(createArticle)
 
     static var previews: some View {
-        let session = Session.Model(user: nil)
+        let session = Session(user: nil)
         let model = Home.Model(articles: articles)
 
         return HomeView(session: session, model: model, send: { _ in })

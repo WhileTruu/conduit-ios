@@ -2,22 +2,25 @@ import Combine
 import SwiftUI
 
 struct Login {
+    let dismissView: Cmd<Msg>
+    let storeUser: (User) -> AnyPublisher<Void, Error>
+
     // MODEL
 
     struct Model {
+        let user: User?
         let email: String
         let password: String
-        let loginResult: Result<User, Http.Error>?
 
         func copy(
+            user: User? = nil,
             email: String? = nil,
-            password: String? = nil,
-            loginResult: Result<User, Http.Error>? = nil
+            password: String? = nil
         ) -> Model {
             Model(
+                user: user ?? self.user,
                 email: email ?? self.email,
-                password: password ?? self.password,
-                loginResult: loginResult ?? self.loginResult
+                password: password ?? self.password
             )
         }
     }
@@ -29,41 +32,63 @@ struct Login {
         case enteredPassword(_ password: String)
         case submittedForm
         case completedLogin(_ result: Result<User, Http.Error>)
+        case storedUser(_ result: Result<Void, Error>)
     }
 
-    static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
+    func update(_ msg: Msg, _ model: Model) -> (Model, Cmd<Msg>) {
         switch msg {
         case .enteredEmail(let email):
-            return (model.copy(email: email), Pub.none())
+            return (model.copy(email: email), Cmd.none())
 
         case .enteredPassword(let password):
-            return (model.copy(password: password), Pub.none())
+            return (model.copy(password: password), Cmd.none())
 
         case .submittedForm:
             return (model, login(email: model.email, password: model.password))
 
         case .completedLogin(.success(let user)):
-            return (model.copy(loginResult: .success(user)), Pub.none())
+            return (
+                model.copy(user: user),
+                storeUser(user)
+                    .map { Msg.storedUser(.success($0)) }
+                    .catch { Just(Msg.storedUser(.failure($0))) }
+                    .toCmd()
+            )
 
-        case .completedLogin(.failure(let error)):
-            return (model.copy(loginResult: .failure(error)), Pub.none())
+        case .completedLogin(.failure(_)):
+            return (model, Cmd.none())
+
+        case .storedUser(.success()):
+            return (model, dismissView)
+
+        case .storedUser(.failure(_)):
+            return (model, Cmd.none())
         }
     }
 
     // VIEW
 
-    static func view() -> some View { LoginViewHost() }
+    static func view() -> some View { LoginViewEnvProvider() }
 
     // STORE
 
-    static func createStore() -> Store<Msg, Model> {
-        let model = Model(email: "", password: "", loginResult: nil)
+    func createStore(
+        _ session: Session,
+        _ presentationMode: Binding<PresentationMode>
+    )
+        -> Store<Msg, Model>
+    {
+        let model = Model(user: nil, email: "", password: "")
 
-        return Store(model: model, effect: Pub.none(), update: update)
+        return Store(
+            model: model,
+            effect: Cmd.none(),
+            update: update
+        )
     }
 }
 
-private func login(email: String, password: String) -> Pub<Login.Msg> {
+private func login(email: String, password: String) -> Cmd<Login.Msg> {
     guard
         let url = URL(
             string: "https://conduit.productionready.io/api/users/login"
@@ -78,7 +103,7 @@ private func login(email: String, password: String) -> Pub<Login.Msg> {
     .map(Result.success)
     .catch { Just(Result.failure($0)) }
     .map(Login.Msg.completedLogin)
-    .toPub()
+    .toCmd()
 }
 
 private func createLoginRequestBody(email: String, password: String) -> Data? {
@@ -91,24 +116,33 @@ private func createLoginRequestBody(email: String, password: String) -> Data? {
     }
 }
 
-private struct LoginViewHost: View {
-    @EnvironmentObject var sessionStore: Store<Session.Msg, Session.Model>
+struct LoginViewEnvProvider: View {
+    @EnvironmentObject var session: Session
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var store: Store = Login.createStore()
 
-    var body: some View {
-        if case .success(let user) = store.model.loginResult {
-            self.presentationMode.wrappedValue.dismiss()
+    var body: some View { LoginViewHost(session, presentationMode) }
+}
+
+struct LoginViewHost: View {
+    @ObservedObject var store: Store<Login.Msg, Login.Model>
+
+    init(
+        _ session: Session,
+        _ presentationMode: Binding<PresentationMode>
+    ) {
+        let dismissView = Cmd<Login.Msg>.fromFunc {
+            presentationMode.wrappedValue.dismiss()
         }
 
-        return LoginView(model: store.model, send: store.send)
-            .onDisappear(perform: {
-                if case .success(let user) = self.store.model.loginResult {
-                    return self.sessionStore.send(Session.Msg.savedUser(user))
-                } else {
-                    return self.sessionStore.send(Session.Msg.removedUser)
-                }
-            })
+        self.store = Login(
+            dismissView: dismissView,
+            storeUser: session.storeUser
+        )
+        .createStore(session, presentationMode)
+    }
+
+    var body: some View {
+        LoginView(model: store.model, send: store.send)
     }
 }
 
@@ -170,9 +204,9 @@ struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
         LoginView(
             model: Login.Model(
+                user: nil,
                 email: "email@email.io",
-                password: "password",
-                loginResult: nil
+                password: "password"
             ),
             send: { _ in }
         )

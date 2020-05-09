@@ -1,120 +1,88 @@
 import Combine
 import Foundation
 
-struct Session {
-    // MODEL
+class Session: ObservableObject {
+    @Published private(set) var user: User?
 
-    struct Model {
-        let user: User?
+    init() {
+        self.user = {
+            switch Keychain.copyFromKeychain() {
+            case .success(let user): return user
+            case .failure: return nil
+            }
+        }()
     }
 
-    // UPDATE
-
-    enum Msg {
-        case savedUser(_ user: User)
-        case removedUser
-        case savedToKeychain(Result<User, KeychainError>)
-        case removedFromKeychain(Result<Void, KeychainError>)
+    init(user: User?) {
+        self.user = user
     }
 
-    static func update(msg: Msg, model: Model) -> (Model, Pub<Msg>) {
-        switch msg {
-        case .savedUser(let user):
-            return (model, saveToKeychain(user: user))
+    func storeUser(_ user: User) -> AnyPublisher<Void, Error> {
+        Future<Void, Error> { promise in
+            let replaceUserInKeychain = Keychain.deleteFromKeychain()
+                .flatMap({ _ in Keychain.saveToKeychain(user: user) })
 
-        case .removedUser:
-            return (model, deleteFromKeychain())
-
-        case .savedToKeychain(.success(let user)):
-            return (Model(user: user), Pub.none())
-
-        case .savedToKeychain(.failure(_)):
-            return (Model(user: nil), deleteFromKeychain())
-
-        case .removedFromKeychain(.success(_)):
-            return (Model(user: nil), Pub.none())
-
-        case .removedFromKeychain(.failure(_)):
-            return (Model(user: nil), Pub.none())
+            switch replaceUserInKeychain {
+            case .success:
+                self.user = user
+                promise(.success(Void()))
+            case .failure(let error): promise(.failure(error))
+            }
         }
+        .eraseToAnyPublisher()
     }
 
-    static func saveToKeychain(user: User) -> Pub<Msg> {
-        saveToKeychainPublisher(user: user)
-            .map { Msg.savedToKeychain(.success(user)) }
-            .catch { Just(Msg.savedToKeychain(.failure($0))) }
-            .toPub()
+    func removeUser() -> AnyPublisher<Void, Error> {
+        Future<Void, Error> { promise in
+            switch Keychain.deleteFromKeychain() {
+            case .success:
+                self.user = nil
+                promise(.success(Void()))
+            case .failure(let error): promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
     }
+}
 
-    static func deleteFromKeychain() -> Pub<Msg> {
-        deleteFromKeychainPublisher()
-            .map { Msg.removedFromKeychain(.success($0)) }
-            .catch { Just(Msg.removedFromKeychain(.failure($0))) }
-            .toPub()
-    }
-
-    enum KeychainError: Error {
+struct Keychain {
+    enum Error: Swift.Error {
         case noItem
         case unexpectedUserData
         case unhandledError(status: OSStatus)
     }
 
-    static func saveToKeychainPublisher(user: User) -> AnyPublisher<
-        Void, KeychainError
-    > {
-        Future<Void, KeychainError> { promise in
-            guard let userJsonData = try? JSONEncoder().encode(user) else {
-                return promise(.failure(KeychainError.unexpectedUserData))
-            }
-
-            let query: [String: Any] = [
-                kSecClass as String: kSecClassGenericPassword,
-                kSecAttrLabel as String: "user",
-                kSecValueData as String: userJsonData,
-            ]
-
-            let status = SecItemAdd(query as CFDictionary, nil)
-            guard status == errSecSuccess else {
-                return promise(
-                    .failure(KeychainError.unhandledError(status: status))
-                )
-            }
-            return promise(.success(Void()))
+    static func saveToKeychain(user: User) -> Result<Void, Error> {
+        guard let userJsonData = try? JSONEncoder().encode(user) else {
+            return (.failure(.unexpectedUserData))
         }
-        .eraseToAnyPublisher()
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrLabel as String: "user",
+            kSecValueData as String: userJsonData,
+        ]
+
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            return (.failure(.unhandledError(status: status)))
+        }
+        return (.success(Void()))
     }
 
-    static func copyFromKeychainPublisher() -> AnyPublisher<User, KeychainError>
-    {
-        Future<User, KeychainError> { promise in
-            switch copyFromKeychain() {
-            case .failure(let error): promise(.failure(error))
-            case .success(let user): promise(.success(user))
-            }
+    static func deleteFromKeychain() -> Result<Void, Error> {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrLabel as String: "user",
+        ]
+        let status = SecItemDelete(query as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else {
+            return .failure(.unhandledError(status: status))
         }
-        .eraseToAnyPublisher()
+        return .success(Void())
     }
 
-    static func deleteFromKeychainPublisher() -> AnyPublisher<
-        Void, KeychainError
-    > {
-        Future<Void, KeychainError> { promise in
-            let query: [String: Any] = [
-                kSecClass as String: kSecClassGenericPassword,
-                kSecAttrLabel as String: "user",
-            ]
-            let status = SecItemDelete(query as CFDictionary)
-            guard status == errSecSuccess || status == errSecItemNotFound else {
-                return promise(
-                    .failure(KeychainError.unhandledError(status: status))
-                )
-            }
-            return promise(.success(Void()))
-        }
-        .eraseToAnyPublisher()
-    }
-
-    static func copyFromKeychain() -> Result<User, KeychainError> {
+    static func copyFromKeychain() -> Result<User, Error> {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrLabel as String: "user",
@@ -125,12 +93,12 @@ struct Session {
         var item: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         guard status != errSecItemNotFound else {
-            return .failure(KeychainError.noItem)
+            return .failure(.noItem)
 
         }
         guard status == errSecSuccess else {
             return
-                .failure(KeychainError.unhandledError(status: status))
+                .failure(.unhandledError(status: status))
         }
 
         guard
@@ -140,25 +108,8 @@ struct Session {
                 from: userData
             )
         else {
-            return .failure(KeychainError.unexpectedUserData)
+            return .failure(.unexpectedUserData)
         }
         return .success(user)
-    }
-
-    // STORE
-
-    static func createStore() -> Store<Msg, Model> {
-        let user: User? = {
-            switch copyFromKeychain() {
-            case .success(let user): return user
-            case .failure: return nil
-            }
-        }()
-
-        return Store(
-            model: Model(user: user),
-            effect: Pub.none(),
-            update: update
-        )
     }
 }
