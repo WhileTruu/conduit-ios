@@ -13,17 +13,17 @@ struct Login {
 
     struct Model {
         let user: User?
-        let email: String
+        let username: String
         let password: String
 
         func copy(
             user: User? = nil,
-            email: String? = nil,
+            username: String? = nil,
             password: String? = nil
         ) -> Model {
             Model(
                 user: user ?? self.user,
-                email: email ?? self.email,
+                username: username ?? self.username,
                 password: password ?? self.password
             )
         }
@@ -32,25 +32,28 @@ struct Login {
     // UPDATE
 
     enum Msg {
-        case enteredEmail(_ email: String)
+        case enteredUsername(_ email: String)
         case enteredPassword(_ password: String)
         case submittedForm
         case completedLogin(_ result: Result<User, Http.Error>)
         case storedUser(_ result: Result<Void, Error>)
+        case clickedCancel
     }
 
     static func update(_ env: Env, _ msg: Msg, _ model: Model)
         -> (Model, Cmd<Msg>)
     {
         switch msg {
-        case .enteredEmail(let email):
-            return (model.copy(email: email), Cmd.none())
+        case .enteredUsername(let username):
+            return (model.copy(username: username), Cmd.none())
 
         case .enteredPassword(let password):
             return (model.copy(password: password), Cmd.none())
 
         case .submittedForm:
-            return (model, login(email: model.email, password: model.password))
+            return (
+                model, login(email: model.username, password: model.password)
+            )
 
         case .completedLogin(.success(let user)):
             return (
@@ -69,6 +72,9 @@ struct Login {
 
         case .storedUser(.failure(_)):
             return (model, Cmd.none())
+
+        case .clickedCancel:
+            return (model, env.dismissView)
         }
     }
 
@@ -79,7 +85,7 @@ struct Login {
     // STORE
 
     static func createStore(_ env: Env) -> Store<Msg, Model> {
-        let model = Model(user: nil, email: "", password: "")
+        let model = Model(user: nil, username: "", password: "")
 
         return Store(
             model: model,
@@ -148,9 +154,9 @@ private struct LoginView: View {
     let send: (Login.Msg) -> Void
 
     var body: some View {
-        let email = Binding<String>(
-            get: { self.model.email },
-            set: { self.send(.enteredEmail($0)) }
+        let username = Binding<String>(
+            get: { self.model.username },
+            set: { self.send(.enteredUsername($0)) }
         )
 
         let password = Binding<String>(
@@ -158,54 +164,123 @@ private struct LoginView: View {
             set: { self.send(.enteredPassword($0)) }
         )
 
-        return VStack(spacing: 8) {
-            TextField("Username", text: email)
-                .textFieldStyle(LoginTextFieldStyle())
-                .autocapitalization(.none)
-            SecureField("Password", text: password)
-                .autocapitalization(.none)
-                .textFieldStyle(LoginTextFieldStyle())
-
-            Button(action: { self.send(.submittedForm) }) {
-                Text("Button")
+        return VStack(alignment: .center, spacing: 36) {
+            HStack {
+                Button(action: { self.send(.clickedCancel) }) {
+                    Text("Cancel").foregroundColor(Color(UIColor.link))
+                }
+                Spacer()
+                Button(action: { self.send(.submittedForm) }) {
+                    Text("Sign In").foregroundColor(Color(UIColor.link))
+                }
             }
-            .buttonStyle(LoginButtonStyle())
+
+            Text("Sign In Requested").fontWeight(.bold).font(.largeTitle)
+
+            LoginFormView(username: username, password: password)
+                .padding(
+                    EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 10)
+                )
+            Spacer()
         }
         .padding()
-        .navigationBarTitle("Log in")
+    }
+}
+
+private struct LoginFormView: View {
+    @Binding var username: String
+    @Binding var password: String
+    @State private var maxLabelWidth: CGFloat? = nil
+
+    var body: some View {
+        Group {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Username")
+                        .frame(width: maxLabelWidth, alignment: .leading)
+                        .lineLimit(1)
+                        .background(WidthPreferenceGeometryView())
+                    TextField("Username", text: $username)
+                        .textFieldStyle(LoginTextFieldStyle())
+                }
+                Divider()
+                HStack {
+                    Text("Password")
+                        .frame(width: maxLabelWidth, alignment: .leading)
+                        .lineLimit(1)
+                        .background(WidthPreferenceGeometryView())
+                    SecureField("Password", text: $password)
+                        .textFieldStyle(LoginTextFieldStyle())
+                }
+                Divider()
+            }.onPreferenceChange(WidthPreferenceKey.self) { preferences in
+                for p in preferences {
+                    if p.width > (self.maxLabelWidth ?? CGFloat.zero) {
+                        self.maxLabelWidth = p.width
+                    }
+                }
+            }
+        }
     }
 }
 
 private struct LoginTextFieldStyle: TextFieldStyle {
-    func _body(configuration: TextField<Self._Label>) -> some View {
+    func _body(configuration: TextField<_Label>) -> some View {
         configuration
-            .padding(8)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color.gray, lineWidth: 1)
-            )
+            .padding(EdgeInsets(top: 10, leading: 25, bottom: 10, trailing: 0))
+            .autocapitalization(.none)
+            .frame(maxWidth: .infinity)
     }
 }
 
-private struct LoginButtonStyle: ButtonStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label
-            .padding(8)
-            .foregroundColor(Color.white)
-            .background(Color.green)
-            .cornerRadius(8)
+private struct WidthPreferenceKey: PreferenceKey {
+    typealias Value = [WidthPreference]
+
+    static var defaultValue: [WidthPreference] = []
+
+    static func reduce(
+        value: inout [WidthPreference],
+        nextValue: () -> [WidthPreference]
+    ) {
+        value.append(contentsOf: nextValue())
+    }
+}
+
+private struct WidthPreference: Equatable {
+    let width: CGFloat
+}
+
+private struct WidthPreferenceGeometryView: View {
+    var body: some View {
+        GeometryReader { geometry in
+            Rectangle()
+                .fill(Color.clear)
+                .preference(
+                    key: WidthPreferenceKey.self,
+                    value: [
+                        WidthPreference(
+                            width: geometry.frame(in: CoordinateSpace.global)
+                                .width
+                        )
+                    ]
+                )
+        }
     }
 }
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView(
+        let loginView = LoginView(
             model: Login.Model(
                 user: nil,
-                email: "email@email.io",
+                username: "email@email.io",
                 password: "password"
             ),
             send: { _ in }
         )
+        return Group {
+            NavigationView { loginView }.environment(\.colorScheme, .light)
+            NavigationView { loginView }.environment(\.colorScheme, .dark)
+        }
     }
 }

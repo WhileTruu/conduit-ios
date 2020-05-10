@@ -111,16 +111,8 @@ private struct HomeView: View {
     }
 
     var profileButton: some View {
-        HStack {
-            if session.user == nil {
-                NavigationLink(destination: Authentication.view()) {
-                    profileImage
-                }
-            } else {
-                NavigationLink(destination: Profile.view()) {
-                    profileImage
-                }
-            }
+        NavigationLink(destination: Account.view()) {
+            profileImage
         }
     }
 
