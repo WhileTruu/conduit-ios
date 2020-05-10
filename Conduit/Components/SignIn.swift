@@ -1,7 +1,7 @@
 import Combine
 import SwiftUI
 
-struct Login {
+struct SignIn {
     // ENV
 
     struct Env {
@@ -35,7 +35,7 @@ struct Login {
         case enteredUsername(_ email: String)
         case enteredPassword(_ password: String)
         case submittedForm
-        case completedLogin(_ result: Result<User, Http.Error>)
+        case completedSignIn(_ result: Result<User, Http.Error>)
         case storedUser(_ result: Result<Void, Error>)
         case clickedCancel
     }
@@ -52,10 +52,10 @@ struct Login {
 
         case .submittedForm:
             return (
-                model, login(email: model.username, password: model.password)
+                model, signIn(email: model.username, password: model.password)
             )
 
-        case .completedLogin(.success(let user)):
+        case .completedSignIn(.success(let user)):
             return (
                 model.copy(user: user),
                 env.storeUser(user)
@@ -64,7 +64,7 @@ struct Login {
                     .toCmd()
             )
 
-        case .completedLogin(.failure(_)):
+        case .completedSignIn(.failure(_)):
             return (model, Cmd.none())
 
         case .storedUser(.success()):
@@ -80,7 +80,7 @@ struct Login {
 
     // VIEW
 
-    static func view() -> some View { LoginViewEnvProvider() }
+    static func view() -> some View { SignInViewEnvProvider() }
 
     // STORE
 
@@ -95,7 +95,7 @@ struct Login {
     }
 }
 
-private func login(email: String, password: String) -> Cmd<Login.Msg> {
+private func signIn(email: String, password: String) -> Cmd<SignIn.Msg> {
     guard
         let url = URL(
             string: "https://conduit.productionready.io/api/users/login"
@@ -104,16 +104,16 @@ private func login(email: String, password: String) -> Cmd<Login.Msg> {
 
     return Http.post(
         url: url,
-        body: createLoginRequestBody(email: email, password: password),
+        body: createSignInRequestBody(email: email, password: password),
         decoder: JSONDecoder()
     )
     .map(Result.success)
     .catch { Just(Result.failure($0)) }
-    .map(Login.Msg.completedLogin)
+    .map(SignIn.Msg.completedSignIn)
     .toCmd()
 }
 
-private func createLoginRequestBody(email: String, password: String) -> Data? {
+private func createSignInRequestBody(email: String, password: String) -> Data? {
     let json: [String: Any] = ["user": ["email": email, "password": password]]
 
     do {
@@ -123,14 +123,14 @@ private func createLoginRequestBody(email: String, password: String) -> Data? {
     }
 }
 
-struct LoginViewEnvProvider: View {
+struct SignInViewEnvProvider: View {
     @EnvironmentObject var session: Session
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        LoginViewHost(
-            Login.Env(
-                dismissView: Cmd<Login.Msg>.fromFunc {
+        SignInViewHost(
+            SignIn.Env(
+                dismissView: Cmd<SignIn.Msg>.fromFunc {
                     self.presentationMode.wrappedValue.dismiss()
                 },
                 storeUser: session.storeUser
@@ -139,19 +139,19 @@ struct LoginViewEnvProvider: View {
     }
 }
 
-struct LoginViewHost: View {
-    @ObservedObject var store: Store<Login.Msg, Login.Model>
+struct SignInViewHost: View {
+    @ObservedObject var store: Store<SignIn.Msg, SignIn.Model>
 
-    init(_ env: Login.Env) { self.store = Login.createStore(env) }
+    init(_ env: SignIn.Env) { self.store = SignIn.createStore(env) }
 
     var body: some View {
-        LoginView(model: store.model, send: store.send)
+        SignInView(model: store.model, send: store.send)
     }
 }
 
-private struct LoginView: View {
-    let model: Login.Model
-    let send: (Login.Msg) -> Void
+private struct SignInView: View {
+    let model: SignIn.Model
+    let send: (SignIn.Msg) -> Void
 
     var body: some View {
         let username = Binding<String>(
@@ -177,7 +177,7 @@ private struct LoginView: View {
 
             Text("Sign In Requested").fontWeight(.bold).font(.largeTitle)
 
-            LoginFormView(username: username, password: password)
+            SignInFormView(username: username, password: password)
                 .padding(
                     EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 10)
                 )
@@ -187,7 +187,7 @@ private struct LoginView: View {
     }
 }
 
-private struct LoginFormView: View {
+private struct SignInFormView: View {
     @Binding var username: String
     @Binding var password: String
     @State private var maxLabelWidth: CGFloat? = nil
@@ -201,7 +201,7 @@ private struct LoginFormView: View {
                         .lineLimit(1)
                         .background(WidthPreferenceGeometryView())
                     TextField("Username", text: $username)
-                        .textFieldStyle(LoginTextFieldStyle())
+                        .textFieldStyle(SignInTextFieldStyle())
                 }
                 Divider()
                 HStack {
@@ -210,7 +210,7 @@ private struct LoginFormView: View {
                         .lineLimit(1)
                         .background(WidthPreferenceGeometryView())
                     SecureField("Password", text: $password)
-                        .textFieldStyle(LoginTextFieldStyle())
+                        .textFieldStyle(SignInTextFieldStyle())
                 }
                 Divider()
             }.onPreferenceChange(WidthPreferenceKey.self) { preferences in
@@ -224,7 +224,7 @@ private struct LoginFormView: View {
     }
 }
 
-private struct LoginTextFieldStyle: TextFieldStyle {
+private struct SignInTextFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<_Label>) -> some View {
         configuration
             .padding(EdgeInsets(top: 10, leading: 25, bottom: 10, trailing: 0))
@@ -268,10 +268,10 @@ private struct WidthPreferenceGeometryView: View {
     }
 }
 
-struct LoginView_Previews: PreviewProvider {
+struct SignInView_Previews: PreviewProvider {
     static var previews: some View {
-        let loginView = LoginView(
-            model: Login.Model(
+        let signInView = SignInView(
+            model: SignIn.Model(
                 user: nil,
                 username: "email@email.io",
                 password: "password"
@@ -279,8 +279,8 @@ struct LoginView_Previews: PreviewProvider {
             send: { _ in }
         )
         return Group {
-            NavigationView { loginView }.environment(\.colorScheme, .light)
-            NavigationView { loginView }.environment(\.colorScheme, .dark)
+            NavigationView { signInView }.environment(\.colorScheme, .light)
+            NavigationView { signInView }.environment(\.colorScheme, .dark)
         }
     }
 }

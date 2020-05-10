@@ -28,7 +28,7 @@ struct Account {
 
     enum Msg {
         case changedSheetView(_ sheetView: SheetView)
-        case loggedOut
+        case signedOut
         case removedUser(_ result: Result<Void, Error>)
 
     }
@@ -40,7 +40,7 @@ struct Account {
         case .changedSheetView(let value):
             return (model.copy(sheetView: value), Cmd.none())
 
-        case .loggedOut:
+        case .signedOut:
             return (
                 model,
                 env.removeUser()
@@ -126,7 +126,7 @@ struct AccountView: View {
                     }
                     .buttonStyle(ConduitButtonStyle())
                     .sheet(isPresented: isShowingSignInSheet) {
-                        Login.view().environmentObject(self.session)
+                        SignIn.view().environmentObject(self.session)
                     }
 
                     Button(action: { self.send(.changedSheetView(.signUp)) }) {
@@ -141,7 +141,7 @@ struct AccountView: View {
                     }
 
                 } else {
-                    Button(action: { self.send(.loggedOut) }) {
+                    Button(action: { self.send(.signedOut) }) {
                         Text("Sign Out")
                     }
                     .buttonStyle(ConduitButtonStyle())
