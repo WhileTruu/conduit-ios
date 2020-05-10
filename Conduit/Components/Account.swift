@@ -103,43 +103,12 @@ struct AccountView: View {
     let send: (Account.Msg) -> Void
 
     var body: some View {
-        let isShowingSignInSheet = Binding<Bool>(
-            get: { self.model.sheetView == .signIn },
-            set: { self.send(.changedSheetView($0 ? .signIn : .none)) }
-        )
-
-        let isShowingSignUpSheet = Binding<Bool>(
-            get: { self.model.sheetView == .signUp },
-            set: { self.send(.changedSheetView($0 ? .signUp : .none)) }
-        )
-
-        return ZStack(alignment: .top) {
+        ZStack(alignment: .top) {
             Color(UIColor.systemGroupedBackground).edgesIgnoringSafeArea(.all)
 
             VStack(alignment: .leading, spacing: 30) {
                 if session.user == nil {
-                    Button(action: { self.send(.changedSheetView(.signIn)) }) {
-                        HStack {
-                            Text("Sign In").foregroundColor(Color(UIColor.link))
-                            Spacer()
-                        }
-                    }
-                    .buttonStyle(ConduitButtonStyle())
-                    .sheet(isPresented: isShowingSignInSheet) {
-                        SignIn.view().environmentObject(self.session)
-                    }
-
-                    Button(action: { self.send(.changedSheetView(.signUp)) }) {
-                        HStack {
-                            Text("Sign Up").foregroundColor(Color(UIColor.link))
-                            Spacer()
-                        }
-                    }
-                    .buttonStyle(ConduitButtonStyle())
-                    .sheet(isPresented: isShowingSignUpSheet) {
-                        SignUp.view()
-                    }
-
+                    SignedInView(session: session, model: model, send: send)
                 } else {
                     Button(action: { self.send(.signedOut) }) {
                         Text("Sign Out")
@@ -155,11 +124,64 @@ struct AccountView: View {
     }
 }
 
+private struct SignedInView: View {
+    let session: Session
+    let model: Account.Model
+    let send: (Account.Msg) -> Void
+
+    var body: some View {
+        let isShowingSignInSheet = Binding<Bool>(
+            get: { self.model.sheetView == .signIn },
+            set: { self.send(.changedSheetView($0 ? .signIn : .none)) }
+        )
+
+        let isShowingSignUpSheet = Binding<Bool>(
+            get: { self.model.sheetView == .signUp },
+            set: { self.send(.changedSheetView($0 ? .signUp : .none)) }
+        )
+
+        return Group {
+            VStack(alignment: .leading, spacing: 6) {
+                Button(action: { self.send(.changedSheetView(.signIn)) }) {
+                    HStack {
+                        Text("Sign In").foregroundColor(Color(UIColor.link))
+                        Spacer()
+                    }
+                }
+                .buttonStyle(ConduitButtonStyle())
+                .sheet(isPresented: isShowingSignInSheet) {
+                    SignIn.view().environmentObject(self.session)
+                }
+                Text("Sign in with to manage your account, favorite things and more.").font(.footnote)
+                    .padding([.leading, .trailing], 15)
+                    .foregroundColor(Color(UIColor.secondaryLabel))
+            }
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Need an account?".uppercased()).font(.footnote)
+                    .padding([.leading, .trailing], 15)
+                    .foregroundColor(Color(UIColor.secondaryLabel))
+                Button(action: { self.send(.changedSheetView(.signUp)) }) {
+                    HStack {
+                        Text("Sign Up").foregroundColor(
+                            Color(UIColor.link)
+                        )
+                        Spacer()
+                    }
+                }
+                .buttonStyle(ConduitButtonStyle())
+                .sheet(isPresented: isShowingSignUpSheet) {
+                    SignUp.view()
+                }
+            }
+        }
+    }
+}
+
 struct ConduitButtonStyle: ButtonStyle {
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .frame(maxWidth: .infinity)
-            .padding(10)
+            .frame(maxWidth: .infinity, minHeight: 45)
+            .padding(.leading, 15)
             .background(
                 configuration.isPressed
                     ? Color(UIColor.systemGray4)
