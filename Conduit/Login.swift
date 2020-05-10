@@ -2,8 +2,12 @@ import Combine
 import SwiftUI
 
 struct Login {
-    let dismissView: Cmd<Msg>
-    let storeUser: (User) -> AnyPublisher<Void, Error>
+    // ENV
+
+    struct Env {
+        let dismissView: Cmd<Msg>
+        let storeUser: (User) -> AnyPublisher<Void, Error>
+    }
 
     // MODEL
 
@@ -35,7 +39,9 @@ struct Login {
         case storedUser(_ result: Result<Void, Error>)
     }
 
-    func update(_ msg: Msg, _ model: Model) -> (Model, Cmd<Msg>) {
+    static func update(_ env: Env, _ msg: Msg, _ model: Model)
+        -> (Model, Cmd<Msg>)
+    {
         switch msg {
         case .enteredEmail(let email):
             return (model.copy(email: email), Cmd.none())
@@ -49,7 +55,7 @@ struct Login {
         case .completedLogin(.success(let user)):
             return (
                 model.copy(user: user),
-                storeUser(user)
+                env.storeUser(user)
                     .map { Msg.storedUser(.success($0)) }
                     .catch { Just(Msg.storedUser(.failure($0))) }
                     .toCmd()
@@ -59,7 +65,7 @@ struct Login {
             return (model, Cmd.none())
 
         case .storedUser(.success()):
-            return (model, dismissView)
+            return (model, env.dismissView)
 
         case .storedUser(.failure(_)):
             return (model, Cmd.none())
@@ -72,18 +78,13 @@ struct Login {
 
     // STORE
 
-    func createStore(
-        _ session: Session,
-        _ presentationMode: Binding<PresentationMode>
-    )
-        -> Store<Msg, Model>
-    {
+    static func createStore(_ env: Env) -> Store<Msg, Model> {
         let model = Model(user: nil, email: "", password: "")
 
         return Store(
             model: model,
             effect: Cmd.none(),
-            update: update
+            update: { update(env, $0, $1) }
         )
     }
 }
@@ -120,26 +121,22 @@ struct LoginViewEnvProvider: View {
     @EnvironmentObject var session: Session
     @Environment(\.presentationMode) var presentationMode
 
-    var body: some View { LoginViewHost(session, presentationMode) }
+    var body: some View {
+        LoginViewHost(
+            Login.Env(
+                dismissView: Cmd<Login.Msg>.fromFunc {
+                    self.presentationMode.wrappedValue.dismiss()
+                },
+                storeUser: session.storeUser
+            )
+        )
+    }
 }
 
 struct LoginViewHost: View {
     @ObservedObject var store: Store<Login.Msg, Login.Model>
 
-    init(
-        _ session: Session,
-        _ presentationMode: Binding<PresentationMode>
-    ) {
-        let dismissView = Cmd<Login.Msg>.fromFunc {
-            presentationMode.wrappedValue.dismiss()
-        }
-
-        self.store = Login(
-            dismissView: dismissView,
-            storeUser: session.storeUser
-        )
-        .createStore(session, presentationMode)
-    }
+    init(_ env: Login.Env) { self.store = Login.createStore(env) }
 
     var body: some View {
         LoginView(model: store.model, send: store.send)
